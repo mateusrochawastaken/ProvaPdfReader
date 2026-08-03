@@ -3,15 +3,25 @@ package starterpackage.dataacesslayer.dto;
 import java.util.Optional;
 
 /**
- * Classe que representa bem simplificadamente um TextObject de Streams pdf com Tm e Tj[Sem suporte para TJ(de array)]
+ * Classe que representa uma unidade de texto de Streams PDF, todos os Tj(sem suporte para TJ array) têm a sua propria Unit, com
+ * todos os operadores de posição(atualmente só Td e Tm) simplificados para um Tm, da mesma forma
+ * que a documentação do PDF diz que acontece internamente.
+ * @author Mateus Rocha
  */
-public class TextObject {
+public class TextUnit {
 
     private float[] tm;
     private Optional<String> tj;
 
+    /**
+     * Instancia a classe com um Tj(arrays ainda não funcionam) e uma Tm,
+     * essa Tm deve estar multiplicada com todos os Td que modificam ela(veja
+     * a documentação dos arquivos PDF).
+     * @param tm Essa Tm deve estar multiplicada com todos os Td que modificam ela(veja a documentação dos arquivos PDF).
+     * @param tj Tj com o texto da unit(arrays ainda não funcionam)
+     */
 
-    public TextObject(float[] tm, Optional<String> tj){
+    public TextUnit(float[] tm, Optional<String> tj){
         this.tm = tm;
         this.tj = tj;
     }

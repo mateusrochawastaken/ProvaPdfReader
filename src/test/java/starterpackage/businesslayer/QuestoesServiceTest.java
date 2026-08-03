@@ -1,26 +1,21 @@
 package starterpackage.businesslayer;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import starterpackage.Gabarito;
 
 public class QuestoesServiceTest {
 
     QuestoesService questoesService;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         try {
-            questoesService = new QuestoesService("/home/kkraft/Downloads/2023_GB_impresso_D1_CD1.pdf", 40);
-        }catch (Exception e){
+            String arquivo = "/home/mateus/Documents/IntellijProjects/Misc/Enem2023PrimeiroDiaAmareloGabarito.pdf";
+            questoesService = new QuestoesService(arquivo, 1, 85);
+            //LogManager.getLogger(QuestoesService.class).
+        } catch (Exception e) {
             e.printStackTrace();
             throw new Error(e);
         }
     }
 
-    @Test
-    public void gerarGabaritoTest(){
-        Gabarito gabarito = questoesService.gerarGabarito();
-        System.out.println("debuggerlineyay");
-    }
 }

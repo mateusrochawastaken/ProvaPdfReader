@@ -29,7 +29,7 @@
             <AppenderRef ref="FRAMEWORKS"/>
         </Root>
 
-        <Logger name="starterpackage" level="TRACE" additivity="false">
+        <Logger name="starterpackage" level="INFO" additivity="false">
             <AppenderRef ref="CONSOLE" level="DEBUG"/>
             <AppenderRef ref="TRACE">
                 <LevelMatchFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
