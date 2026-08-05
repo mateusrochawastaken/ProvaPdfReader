@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Entity que representa um gabarito, extende um {@link HashMap} que guarda o numero da questão e sua alternativa
  */
-public class Gabarito extends HashMap<Integer,Character>{
+public class Gabarito extends HashMap<Integer, String>{
 
     int quantidadeQuestoes;
     int primeiraSuposta;

@@ -3,7 +3,7 @@ package starterpackage.businesslayer;
 import org.apache.logging.log4j.LogManager;
 import org.openpdf.text.pdf.*;
 import org.apache.logging.log4j.Logger;
-import starterpackage.dataacesslayer.dto.Gabarito;
+import starterpackage.businesslayer.filtros.DetectorDeFiltro;
 import starterpackage.dataacesslayer.dto.TextUnit;
 import starterpackage.statictools.CustomMath;
 
@@ -33,6 +33,7 @@ public class GabaritoScanner {
     Matcher btMatcher,etMatcher,tmMatcher,tjMatcher;
 
     List<List<TextUnit>> streamsList = new ArrayList<>();
+    DetectorDeFiltro detectorDeFiltro;
 
     Logger logger = LogManager.getLogger();
 
@@ -40,13 +41,16 @@ public class GabaritoScanner {
     /**
      * Instancia o scanner
      * @param arquivoDir diretório do arquivo pdf para scanear
+     * @param detectorDeFiltro para tentar achar filtros no nome do arquivo ou em alguma Tj
      * @throws FileNotFoundException Se o arquivo não for encontrado
      * @throws IOException Se o {@link PdfReader} não aceitar o arquivo(provavelmente o arquivo é invalido se a exception for lançada)
      */
-    public GabaritoScanner(String arquivoDir) throws FileNotFoundException, IOException{
+    public GabaritoScanner(String arquivoDir,DetectorDeFiltro detectorDeFiltro) throws FileNotFoundException, IOException{
         reader = new PdfReader(new FileInputStream(arquivoDir));
         catalog = reader.getCatalog();
         contents = catalog.getAsDict(new PdfName("Pages")).getAsArray(new PdfName("Kids")).getAsDict(0).getAsArray(new PdfName("Contents"));
+        this.detectorDeFiltro = detectorDeFiltro;
+        detectorDeFiltro.findFiltro(new File(arquivoDir).getName());
     }
 
     /**
@@ -124,14 +128,15 @@ public class GabaritoScanner {
                     logger.trace("Inicio do Text Object");
                     Pattern tdPattern = Pattern.compile("Td|TD");
                     Matcher tdMatcher = tdPattern.matcher(objString);
-                    tjMatcher.find();
                     tmMatcher.find(); // Sempre vai ter pelo menos um Tm
+                    boolean tjFound = tjMatcher.find();
                     boolean tdFound = tdMatcher.find();
-                    float[][] td = getProximoTd(tdMatcher);
+                    float[][] td = {};
+                    if(tdFound) td = getProximoTd(tdMatcher);
                     float[] tm = new float[6];
                     boolean beforeTd = true;
                     int tmAtual = 1;
-                    while (tdFound) { //Cada loop desse while lida com uma TextUnit
+                    while (tjFound) { //Cada loop desse while lida com uma TextUnit
                         Matcher proximoTm = tmPattern.matcher(objString);
                         for(int i = 0;i<tmAtual;i++){
                             proximoTm.find();
@@ -147,7 +152,7 @@ public class GabaritoScanner {
                         }
 
                         if(beforeTd) {
-                            if (tjMatcher.start() > tdMatcher.start()){
+                            if (tdFound && tjMatcher.start() > tdMatcher.start()){
                                 beforeTd=false;
                                 td = getProximoTd(tdMatcher);
                                 continue;
@@ -157,7 +162,7 @@ public class GabaritoScanner {
                             Optional<String> tj = getProximoTj(false);
                             streamAtual.add(new TextUnit(tm, tj));
                             logger.trace("Unit persistida");
-                            tjMatcher.find();
+                            tjFound = tjMatcher.find();
                         }else {
                             logger.trace("Inicio da UNIT");
                             if (tjMatcher.start() > tdMatcher.start()) {
@@ -224,7 +229,8 @@ public class GabaritoScanner {
     }
 
     /**
-     * Retorna o proximo Tj encontrado pelo matcher em forma de String[Se for TJ com jota maiusculo(veja a referencia do pdf) ele retorna optional vazia]
+     * Retorna o proximo Tj encontrado pelo matcher em forma de String[Se for TJ com jota maiusculo(veja a referencia do pdf) ele retorna optional vazia].
+     * Alem disso, caso não tenha filtro no detectorDeFiltro, o metodo executa o metodo findFiltro do detector com a Tj encontrada.
      * @param tjPendente true se o tj estiver no inicio da file e nao tiver \n antes(pendente pq ele  so pode pertencer a um elemento de outra stream se ele estiver na primeira linha da stream)
      * @return Retorna o proximo Tj encontrado pelo matcher em forma de String[Se for TJ com jota maiusculo(veja a referencia do pdf) ele retorna optional vazia]
      */
@@ -243,6 +249,7 @@ public class GabaritoScanner {
         }
         toReturn = toReturn.substring(1,toReturn.length()); // tirar o primeiro parentese
         toReturn = toReturn.translateEscapes(); //Pra processar as backslashs(pelo que eu entendi elas estão na mesma encoding da string e pra os bytes ate 255 a PDFDocEncoding é igual ao UTF-16
+        if(detectorDeFiltro.getFiltro().isEmpty()) detectorDeFiltro.findFiltro(toReturn);
         logger.trace("  Tj:" + toReturn);
         return Optional.of(toReturn);
     }

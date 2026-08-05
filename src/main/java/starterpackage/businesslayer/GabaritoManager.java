@@ -2,7 +2,6 @@ package starterpackage.businesslayer;
 
 import starterpackage.dataacesslayer.dto.Gabarito;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -23,7 +22,7 @@ public class GabaritoManager {
     public int getSequencia() {
         int sequenciaHit = 0;
         List<Integer> questoes = new ArrayList<>();
-        for (Map.Entry<Integer, Character> entry : gabarito.entrySet()) {
+        for (Map.Entry<Integer, String> entry : gabarito.entrySet()) {
             if (entry.getKey() >= gabarito.getPrimeiraQuestao() && entry.getKey() <= gabarito.getUltimaQuestao()) {
                 sequenciaHit++;
                 questoes.add(entry.getKey());

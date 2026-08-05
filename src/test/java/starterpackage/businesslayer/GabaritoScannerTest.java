@@ -3,9 +3,14 @@ package starterpackage.businesslayer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import starterpackage.businesslayer.filtros.DetectorDeFiltro;
+import starterpackage.businesslayer.filtros.Filtro;
+import starterpackage.businesslayer.filtros.FiltroEnem;
 import starterpackage.dataacesslayer.dto.TextUnit;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GabaritoScannerTest {
 
@@ -15,7 +20,10 @@ public class GabaritoScannerTest {
     public void scanGabaritoTest(){
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            gabaritoScanner = new GabaritoScanner(classloader.getResource("testFiles/Enem2023PrimeiroDiaAmareloGabarito.pdf").getPath());
+            Map<String, Filtro> beanMapFake = new HashMap<>();
+            beanMapFake.put("ENEM",new FiltroEnem());
+            gabaritoScanner = new GabaritoScanner(classloader.getResource("testFiles/Enem2023PrimeiroDiaAmareloGabarito.pdf").getPath(),
+                    new DetectorDeFiltro(beanMapFake));
         }catch (Exception e){
             e.printStackTrace();
             throw new Error(e);
@@ -31,7 +39,10 @@ public class GabaritoScannerTest {
     public void multiplosTjTest(){
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            gabaritoScanner = new GabaritoScanner(classloader.getResource("testFiles/Enem2024PrimeiroDiaAmareloGabarito.pdf").getPath());
+            Map<String, Filtro> beanMapFake = new HashMap<>();
+            beanMapFake.put("ENEM",new FiltroEnem());
+            gabaritoScanner = new GabaritoScanner(classloader.getResource("testFiles/Enem2024PrimeiroDiaAmareloGabarito.pdf").getPath(),
+                    new DetectorDeFiltro(beanMapFake));
         }catch (Exception e){
             e.printStackTrace();
             throw new Error(e);

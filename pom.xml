@@ -30,7 +30,16 @@
         </plugins>
     </build>
     <dependencies>
-        <!-- Sourcee: https://mvnrepository.com/artifact/com.github.librepdf/openpdf -->
+
+        <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>4.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Source: https://mvnrepository.com/artifact/com.github.librepdf/openpdf -->
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
